@@ -26,7 +26,8 @@ contract MyNFT is ERC721 {
 
     function tokenURI(uint256 _tokenId) public view override returns(string memory) {
         require(_exists(_tokenId));
-        return "blah";
+        console.log("An NFT w/ ID %s has been minted to %s", _tokenId, msg.sender);
+        return "https://www.jsonkeeper.com/b/RUUS?utm_source=buildspace.so&utm_medium=buildspace_project";
     }
 
 
