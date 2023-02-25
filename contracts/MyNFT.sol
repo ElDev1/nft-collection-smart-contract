@@ -2,38 +2,66 @@
 
 pragma solidity ^0.8.17;
 
-import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// We need some util functions for strings.
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-
-contract MyNFT is ERC721 {
-
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
-
-    constructor() ERC721 ("SquareNFT,", "SQUARE") {
-        console.log("this is my NFT");
-    }
-
-    function makeNFT() public {
-        uint256 newItemId = _tokenIds.current();
-
-        _safeMint(msg.sender, newItemId);
-
-        tokenURI(newItemId);
-        _tokenIds.increment();
-    }
-
-    function tokenURI(uint256 _tokenId) public view override returns(string memory) {
-        require(_exists(_tokenId));
-        console.log("An NFT w/ ID %s has been minted to %s", _tokenId, msg.sender);
-        return string(
-            abi.encodePacked(
-                "data:application/json;base64,",
-                "ewogICAgIm5hbWUiOiAiRXBpY0xvcmRIYW1idXJnZXIiLAogICAgImRlc2NyaXB0aW9uIjogIkFuIE5GVCBmcm9tIHRoZSBoaWdobHkgYWNjbGFpbWVkIHNxdWFyZSBjb2xsZWN0aW9uIiwKICAgICJpbWFnZSI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSEJ5WlhObGNuWmxRWE53WldOMFVtRjBhVzg5SW5oTmFXNVpUV2x1SUcxbFpYUWlJSFpwWlhkQ2IzZzlJakFnTUNBek5UQWdNelV3SWo0TkNpQWdJQ0E4YzNSNWJHVStMbUpoYzJVZ2V5Qm1hV3hzT2lCM2FHbDBaVHNnWm05dWRDMW1ZVzFwYkhrNklITmxjbWxtT3lCbWIyNTBMWE5wZW1VNklERTBjSGc3SUgwOEwzTjBlV3hsUGcwS0lDQWdJRHh5WldOMElIZHBaSFJvUFNJeE1EQWxJaUJvWldsbmFIUTlJakV3TUNVaUlHWnBiR3c5SW1Kc1lXTnJJaUF2UGcwS0lDQWdJRHgwWlhoMElIZzlJalV3SlNJZ2VUMGlOVEFsSWlCamJHRnpjejBpWW1GelpTSWdaRzl0YVc1aGJuUXRZbUZ6Wld4cGJtVTlJbTFwWkdSc1pTSWdkR1Y0ZEMxaGJtTm9iM0k5SW0xcFpHUnNaU0krUlhCcFkweHZjbVJJWVcxaWRYSm5aWEk4TDNSbGVIUStEUW84TDNOMlp6ND0iCn0="
-            )
-        );
-    }
+import "hardhat/console.sol";
 
 
+contract MyNFT is ERC721URIStorage {
+  using Counters for Counters.Counter;
+  Counters.Counter private _tokenIds;
+
+  string baseSvg = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='black' /><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
+
+  string[] firstWords = ["Adorable", "Crazy", "Brave", "Arrogant", "Dangerous", "Cute", "Depressed", "Curious", "Calm", "Careful", "Busy", "Rude", "Lazy", "Friendly", "Selfish", "Rational", "Timid"];
+  string[] secondWords = ["Chef", "Doctor", "Police", "Detective", "Scientist", "Programmer", "Journalist", "Dentist", "Accountant", "Designer", "plumber", "Lawyer", "Secretary", "Travel agent", "Receptionist", "Pharmacist"];
+  string[] thirdWords = ["Dog", "Bear", "Goat", "Elephant", "Horse", "Cat", "Frog", "Giraffe", "Monkey", "Iguana", "Sheep", "Snake", "Zebra", "Kangaroo", "Iguana", "Fish", "Flamingo"];
+
+  constructor() ERC721 ("SquareNFT", "SQUARE") {
+    console.log("This is my NFT contract. Woah!");
+  }
+
+  function pickRandomFirstWord(uint256 tokenId) public view returns (string memory) {
+    uint256 rand = random(string(abi.encodePacked("FIRST_WORD", Strings.toString(tokenId))));
+    rand = rand % firstWords.length;
+    return firstWords[rand];
+  }
+
+  function pickRandomSecondWord(uint256 tokenId) public view returns (string memory) {
+    uint256 rand = random(string(abi.encodePacked("SECOND_WORD", Strings.toString(tokenId))));
+    rand = rand % secondWords.length;
+    return secondWords[rand];
+  }
+
+  function pickRandomThirdWord(uint256 tokenId) public view returns (string memory) {
+    uint256 rand = random(string(abi.encodePacked("THIRD_WORD", Strings.toString(tokenId))));
+    rand = rand % thirdWords.length;
+    return thirdWords[rand];
+  }
+
+  function random(string memory input) internal pure returns (uint256) {
+      return uint256(keccak256(abi.encodePacked(input)));
+  }
+
+  function makeNFT() public {
+    uint256 newItemId = _tokenIds.current();
+
+    string memory first = pickRandomFirstWord(newItemId);
+    string memory second = pickRandomSecondWord(newItemId);
+    string memory third = pickRandomThirdWord(newItemId);
+
+    string memory finalSvg = string(abi.encodePacked(baseSvg, first, second, third, "</text></svg>"));
+    console.log("\n--------------------");
+    console.log(finalSvg);
+    console.log("--------------------\n");
+
+    _safeMint(msg.sender, newItemId);
+  
+    _setTokenURI(newItemId, "blah");
+  
+    _tokenIds.increment();
+    console.log("An NFT w/ ID %s has been minted to %s", newItemId, msg.sender);
+  }
 }
