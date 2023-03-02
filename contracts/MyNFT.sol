@@ -18,6 +18,8 @@ contract MyNFT is ERC721URIStorage {
   string[] firstWords = ["Adorable", "Crazy", "Brave", "Arrogant", "Dangerous", "Cute", "Depressed", "Curious", "Calm", "Careful", "Busy", "Rude", "Lazy", "Friendly", "Selfish", "Rational", "Timid"];
   string[] secondWords = ["Chef", "Doctor", "Police", "Detective", "Scientist", "Programmer", "Journalist", "Dentist", "Accountant", "Designer", "plumber", "Lawyer", "Secretary", "Travel agent", "Receptionist", "Pharmacist"];
   string[] thirdWords = ["Dog", "Bear", "Goat", "Elephant", "Horse", "Cat", "Frog", "Giraffe", "Monkey", "Iguana", "Sheep", "Snake", "Zebra", "Kangaroo", "Iguana", "Fish", "Flamingo"];
+  
+  event NewNFTMinted(address sender, uint256 tokenId);
 
   constructor() ERC721 ("SquareNFT", "SQUARE") {
     console.log("This is my NFT contract. Woah!");
@@ -94,5 +96,7 @@ contract MyNFT is ERC721URIStorage {
   
     _tokenIds.increment();
     console.log("An NFT w/ ID %s has been minted to %s", newItemId, msg.sender);
+    emit NewNFTMinted(msg.sender, newItemId);
   }
 }
+
