@@ -12,13 +12,13 @@ Here you can find the smart contract for generating NFTs that was deployed to th
 Clone the project
 
 ```bash
-  git clone https://github.com/ElDev1/rest-countries-challenge
+  git clone https://github.com/ElDev1/nft-collection-smart-contract
 ```
 
 Go to the project directory
 
 ```bash
-  cd rest-countries-challenge
+  cd nft-collection-smart-contract
 ```
 
 Install dependencies
